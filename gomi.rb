@@ -1,44 +1,49 @@
+# coding: utf-8
 require "date"
 require "slack"
-
-Slack.configure do |config|
-  config.token = "YOUR_SLACK_TOKEN"
-end
-
-Slack.auth_test
+require "yaml"
 
 class Gomi
   def who
-    persons = ["@YOUR_NAME", "@YOUR_FRIEND'S_NAME1", "@YOUR_FRIEND'S_NAME2"]
-    person = persons.sample
+    person = @config["persons"].sample
     "<#{person}>"
   end
 
-  def itsu(value)
-    if value == Date.today
+  def itsu(date)
+    if date == Date.today
       "今日"
-    elsif value == Date.today + 1
+    elsif date == Date.today + 1
       "明日"
     else
-      "#{value.month}月#{value.day}日"
+      "#{date.month}月#{date.day}日"
     end
   end
 
-  def gomi_type(value)
-    gomitypes = [["sunday", ""],["monday", "燃える"], ["tuesday", ""], ["wednesday", "ビン・缶・ペットボトル・段ボール"], ["thursday", "燃える"], ["friday", "不燃"], ["saturday", ""]]
-    gomitypes[value.wday][1]
+  def gomi_type(date)
+    gomitypes = @config["gomitypes"]
+    keys = @config["gomitypes"].keys
+    gomitypes[keys[date.wday]]
   end
 
-  def notify_to_slack(value)
-    return if gomi_type(value).empty?
-    Slack.chat_postMessage text: text(value), username: "ゴミ男", channel: "#YOUR_SLACK_CHANNEL"
+  def notify_to_slack(date)
+    return if gomi_type(date).nil?
+    Slack.chat_postMessage text: text(date), username: "ゴミ男", channel: @config["channel"]
   end
 
   def text(value)
     text = "#{who} #{itsu(value)}は#{gomi_type(value)}ゴミの日だよ"
   end
 
+  def init
+    @config = YAML.load_file('conf/config.yml')
+  end
+
   def gomi_info
+    init
+    Slack.configure do |config|
+      config.token = @config["token"]
+    end
+    Slack.auth_test
     if DateTime.now.hour.to_i > 9
       value = Date.today + 1
     else

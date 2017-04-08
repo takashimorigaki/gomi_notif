@@ -6,9 +6,18 @@ persons:
   - '@YOUR_FRIENDS_NAME2'
 gomitypes:
   sunday:
-  monday: '燃える'
+   default:
+  monday:
+    default: '燃える'
   tuesday:
-  wednesday: 'ビン缶・ペットボトル・段ボール'
-  thursdy: '燃える'
+   default:
+  wednesday:
+    default: 'ビン缶・ペットボトル・段ボール'
+  thursdy:
+    default: '燃える'
   friday:
+    default:
+    2week: '不燃'
+    4week: '不燃'
   saturday:
+    default:

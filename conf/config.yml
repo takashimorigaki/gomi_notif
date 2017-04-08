@@ -1,0 +1,14 @@
+channel: '#YOUR_SLACK_CHANNEL'
+token: 'YOUR_SLACK_TOKEN'
+persons:
+  - '@YOUR_NAME'
+  - '@YOUR_FRIENDS_NAME1'
+  - '@YOUR_FRIENDS_NAME2'
+gomitypes:
+  sunday:
+  monday: '燃える'
+  tuesday:
+  wednesday: 'ビン缶・ペットボトル・段ボール'
+  thursdy: '燃える'
+  friday:
+  saturday:

@@ -28,10 +28,10 @@ class Gomi
     wday_keys = @config["gomitypes"].keys
     gomitype = gomitypes[wday_keys[date.wday]]
 
-    if gomitype["default"].nil?
-      gomitype["#{week_num(date)}week"]
-    else
+    if gomitype["#{week_num(date)}week"].nil?
       gomitype["default"]
+    else
+      gomitype["#{week_num(date)}week"]
     end
   end
 
@@ -61,6 +61,11 @@ class Gomi
   def week_num(date)
     wday = (date.wday == 0) ? 6 : date.wday - 1
     (date.day - wday + 13) / 7
+  end
+
+  def test(date)
+    init
+    print("#{text(date)}\n")
   end
 
 end

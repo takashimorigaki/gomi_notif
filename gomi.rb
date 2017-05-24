@@ -4,12 +4,16 @@ require "slack"
 require "yaml"
 
 class Gomi
+  def init
+    @config = YAML.load_file('conf/config.yml')
+  end
+
   def who
     person = @config["persons"].sample
     "<#{person}>"
   end
 
-  def itsu(date)
+  def localed_date(date)
     if date == Date.today
       "今日"
     elsif date == Date.today + 1
@@ -21,8 +25,14 @@ class Gomi
 
   def gomi_type(date)
     gomitypes = @config["gomitypes"]
-    keys = @config["gomitypes"].keys
-    gomitypes[keys[date.wday]]
+    wday_keys = @config["gomitypes"].keys
+    gomitype = gomitypes[wday_keys[date.wday]]
+
+    if gomitype["#{week_num(date)}week"].nil?
+      gomitype["default"]
+    else
+      gomitype["#{week_num(date)}week"]
+    end
   end
 
   def notify_to_slack(date)
@@ -30,12 +40,8 @@ class Gomi
     Slack.chat_postMessage text: text(date), username: "ゴミ男", channel: @config["channel"]
   end
 
-  def text(value)
-    text = "#{who} #{itsu(value)}は#{gomi_type(value)}ゴミの日だよ"
-  end
-
-  def init
-    @config = YAML.load_file('conf/config.yml')
+  def text(date)
+    "#{who} #{localed_date(date)}は#{gomi_type(date)}ゴミの日だよ"
   end
 
   def gomi_info
@@ -45,12 +51,21 @@ class Gomi
     end
     Slack.auth_test
     if DateTime.now.hour.to_i > 9
-      value = Date.today + 1
+      date = Date.today + 1
     else
-      value = Date.today
+      date = Date.today
     end
-    #say_text(value)
-    notify_to_slack(value)
+    notify_to_slack(date)
+  end
+
+  def week_num(date)
+    wday = (date.wday == 0) ? 6 : date.wday - 1
+    (date.day - wday + 13) / 7
+  end
+
+  def test(date)
+    init
+    print("#{text(date)}\n")
   end
 
 end
